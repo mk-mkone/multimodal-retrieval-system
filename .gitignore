@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.Python
+env/
+venv/
+ENV/
+*.env
+*.venv
+pip-log.txt
+poetry.lock
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+*.checkpoint.ipynb
+
+# Logs
+*.log
+logs/
+
+# IDE PyCharm
+.vscode/
+.idea/
+
+# Docker
+*.tar
+*.pid
+docker-compose.override.yml
