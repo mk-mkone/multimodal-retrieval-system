@@ -20,8 +20,69 @@ The system enables researchers to:
 
 ---
 
+## Data Flow Diagram – Ingestion & Indexing
+
+```mermaid
+flowchart TD
+    A[User/API Trigger] --> B[Raw Data Sources]
+    B --> C[Ingestion Module : APIs, Files ]
+    C --> D[Preprocessing & Cleaning]
+    D --> E[Embedding Generator]
+    E --> F[Vector Index : FAISS]
+    D --> G[Structured Storage : SQL, NoSQL]
+    F & G --> H[Unified Search Interface : FastAPI]
+```
+
+---
+
+## Sequence Diagram – User Research
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant UI as Streamlit App
+    participant API as FastAPI Backend
+    participant IDX as Vector Index (FAISS)
+    participant DB as Metadata DB
+
+    U->>UI: Submit query
+    UI->>API: Send request
+    API->>IDX: Search vector similarity
+    API->>DB: Fetch metadata
+    API->>UI: Return results
+    UI->>U: Display results
+```
+
+---
+
 ## Project Structure
-..
+
+```bash
+multimodal-retrieval-system/
+├── app/                          # Main application source code
+│   ├── api/                      # FastAPI route definitions
+│   ├── core/                     # App settings, logging, constants
+│   ├── ingestion/                # Data ingestion from APIs and files
+│   ├── preprocessing/            # Cleaning and transformation of raw data
+│   ├── embedding/                # Embedding models (text, structure, graph)
+│   ├── indexing/                 # FAISS/Elastic indexing and search logic
+│   ├── models/                   # Data models and schemas
+│   ├── services/                 # Business logic (ranking, hybrid search)
+│   └── main.py                   # FastAPI entry point
+├── data/                         # Local storage for data and embeddings
+│   ├── raw/                      # Raw input files
+│   ├── processed/                # Cleaned and transformed data
+│   └── embeddings/               # Saved embedding vectors
+├── notebooks/                    # Jupyter notebooks for prototyping and EDA
+├── scripts/                      # CLI utilities and one-off scripts
+├── tests/                        # Unit and integration tests
+├── docker-compose.yml
+├── Dockerfile
+├── pyproject.toml
+├── README.md
+├── .env.example
+└── .gitignore
+```
 ---
 
 ## Tech Stack
@@ -44,7 +105,7 @@ The system enables researchers to:
 - [ ] Generate embeddings for graph/text/image modalities
 - [ ] Store vectors in FAISS for similarity search
 - [ ] Serve data and search via FastAPI
-- [ ] Optionally visualize results with Streamlit
+- [ ] Visualize results with Streamlit
 
 ---
 
