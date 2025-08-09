@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: materials
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  faiss:
+    image: python:3.11-slim
+    container_name: faiss_indexer
+    volumes:
+      - ./data/embeddings:/app/embeddings
+    working_dir: /app
+    command: tail -f /dev/null
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
