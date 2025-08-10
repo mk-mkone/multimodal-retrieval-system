@@ -33,6 +33,7 @@ _STD_KEYS = {
 }
 """Set of standard LogRecord attribute names to exclude from extra fields."""
 
+
 class JsonFormatter(logging.Formatter):
     """Formatter that outputs logs as JSON with support for custom extra fields and UTC timestamps."""
 
