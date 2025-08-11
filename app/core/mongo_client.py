@@ -1,5 +1,7 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional
+
+from motor.motor_asyncio import AsyncIOMotorClient
+
 from app.core.config import settings
 
 MONGO_URI = str(settings.MONGO_URI)

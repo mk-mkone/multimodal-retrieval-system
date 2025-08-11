@@ -104,12 +104,10 @@ class LoggerFactory:
         root.setLevel(level)
         root.handlers.clear()
 
-        # Console handler (container-friendly)
         console = logging.StreamHandler()
         console.setFormatter(formatter)
         root.addHandler(console)
 
-        # Optional rotating file handler
         if bool(settings.LOG_FILE_ENABLED):
             log_file = settings.LOG_FILE or "logs/app.log"
             os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -119,7 +117,6 @@ class LoggerFactory:
             file_handler.setFormatter(formatter)
             root.addHandler(file_handler)
 
-        # Keep uvicorn logs flowing to root (already formatted)
         for noisy in ("uvicorn", "uvicorn.access"):
             logging.getLogger(noisy).propagate = True
 

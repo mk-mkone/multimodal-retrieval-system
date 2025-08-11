@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from app.core.mongo_client import get_client
+
+from app.api.routes import ingest
 from app.core.config import settings
 from app.core.logging_factory import LoggerFactory
+from app.core.mongo_client import get_client
 from app.core.request_context import RequestLoggingMiddleware
-from app.api.routes import ingest
-
 
 app = FastAPI(title=settings.APP_NAME)
 app.add_middleware(RequestLoggingMiddleware)

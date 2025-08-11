@@ -4,6 +4,7 @@ import pandas as pd
 
 from app.core.config import settings
 from app.ingestion.base import BaseIngestor
+from app.preprocessing.pipeline import preprocess_text
 
 
 class EuropePMCIngestor(BaseIngestor):
@@ -14,6 +15,10 @@ class EuropePMCIngestor(BaseIngestor):
     """
 
     NAME = "text"
+
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self.standardize_fn = preprocess_text
 
     @staticmethod
     def _build_params(

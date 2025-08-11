@@ -1,8 +1,10 @@
 import asyncio
+
 from fastapi import APIRouter, HTTPException
+
 from app.core.logging_factory import LoggerFactory
-from app.ingestion.text_ingestor import EuropePMCIngestor
 from app.ingestion.simulation_ingestor import MaterialsProjectIngestor
+from app.ingestion.text_ingestor import EuropePMCIngestor
 from app.ingestion.timeseries_ingestor import TimeSeriesIngestor
 
 router = APIRouter(prefix="/ingest", tags=["Ingestion"])
