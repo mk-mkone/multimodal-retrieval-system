@@ -1,7 +1,6 @@
 from functools import lru_cache
 from typing import Literal
 from pydantic import AnyUrl, Field
-from pydantic.alias_generators import AliasPath
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -69,7 +68,7 @@ class Settings(BaseSettings):
         validation_alias="MRS_LOG_LEVEL",
     )
     LOG_FILE_ENABLED: bool = Field(
-        default=True,
+        default=False,
         description="If true, also write logs to a file.",
         validation_alias="MRS_LOG_FILE_ENABLED",
     )
@@ -77,6 +76,25 @@ class Settings(BaseSettings):
         default="logs/app.log",
         description="Path of the log file (when enabled).",
         validation_alias="MRS_LOG_FILE",
+    )
+
+    # --- Api URL ---
+    EUROPEPMC_API_URL: str = Field(
+        default="https://www.ebi.ac.uk/europepmc/webservices/rest/search",
+        description="Europepmc API endpoint.",
+        validation_alias="MRS_EUROPEPMC_API_URL",
+    )
+
+    MP_API_URL: str = Field(
+        default="https://api.materialsproject.org/materials/summary",
+        description="Materials Project API endpoint.",
+        validation_alias="MRS_MP_API_URL",
+    )
+
+    MATERIALS_PROJECT_API_KEY: str = Field(
+        default="",
+        description="Materials API key",
+        validation_alias="MRS_MATERIALS_PROJECT_API_KEY",
     )
 
     model_config = SettingsConfigDict(

@@ -11,6 +11,7 @@ class RequestLoggingMiddleware:
     log timing, method, path, and status code, and handle unhandled exceptions
     with appropriate logging.
     """
+
     def __init__(self, app: ASGIApp):
         """
         Stores the ASGI application reference and initializes the logger.
