@@ -83,6 +83,8 @@ async def ingest_source(source: str):
         result = await run_one(source)
         return {"status": "success", "source": source, "result": result}
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error("Ingestion failed", extra={"source": source, "error": str(e)})
         raise HTTPException(status_code=500, detail=str(e))
