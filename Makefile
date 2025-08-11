@@ -19,6 +19,9 @@ run:
 test:
 	poetry run pytest -v tests/
 
+test-cov:
+	poetry run pytest --cov=app --cov-report=term-missing tests/
+
 format:
 	poetry run black .
 
