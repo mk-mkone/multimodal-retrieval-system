@@ -1,11 +1,11 @@
 import json
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
-import logging
 
 import pytest
 
-from app.core.logging_factory import LoggerFactory, JsonFormatter
+from app.core.logging_factory import JsonFormatter, LoggerFactory
 
 
 def _reset_logging_and_factory():

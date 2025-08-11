@@ -45,6 +45,7 @@ coverage = "^7.10.2"
 pre-commit = "^4.2.0"
 pytest-cov = "^6.2.1"
 pytest-mock = "^3.14.1"
+autoflake = "^2.3.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -67,7 +68,7 @@ addopts = "-q"
 testpaths = ["tests"]
 
 [tool.black]
-line-length = 88  # ajuste selon préférence, ex: 100 ou 120
+line-length = 88
 target-version = ["py311"]
 skip-string-normalization = false
 
@@ -80,10 +81,3 @@ remove-unused-variables = true
 remove-all-unused-imports = true
 ignore-init-module-imports = true
 expand-star-imports = true
-
-[tool.flake8]
-max-line-length = 88
-extend-ignore = [
-    "E203",  # espace avant ':', compatible black
-    "W503"   # line break before binary operator, compatible black
-]

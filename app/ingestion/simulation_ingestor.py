@@ -4,6 +4,7 @@ import pandas as pd
 
 from app.core.config import settings
 from app.ingestion.base import BaseIngestor
+from app.preprocessing.pipeline import preprocess_sim
 
 
 class MaterialsProjectIngestor(BaseIngestor):
@@ -21,6 +22,7 @@ class MaterialsProjectIngestor(BaseIngestor):
     def __init__(self, out_dir: str = "data/raw", api_key: Optional[str] = None):
         super().__init__(out_dir)
         self.api_key = api_key or settings.MATERIALS_PROJECT_API_KEY
+        self.standardize_fn = preprocess_sim
 
     @staticmethod
     def _build_params(

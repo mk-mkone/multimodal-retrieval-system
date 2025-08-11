@@ -5,6 +5,7 @@ from typing import Literal
 import pandas as pd
 
 from app.ingestion.base import BaseIngestor
+from app.preprocessing.pipeline import preprocess_timeseries
 
 
 class TimeSeriesIngestor(BaseIngestor):
@@ -16,6 +17,10 @@ class TimeSeriesIngestor(BaseIngestor):
     """
 
     NAME = "timeseries"
+
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self.standardize_fn = preprocess_timeseries
 
     def fetch(self, path: str, kind: Literal["csv", "json", "netcdf"] = "csv") -> str:
         """
