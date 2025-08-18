@@ -5,6 +5,8 @@ import pandas as pd
 from app.core.config import settings
 from app.ingestion.base import BaseIngestor
 from app.preprocessing.pipeline import preprocess_sim
+from typing import Optional
+from app.core.registry import Registry
 
 
 class MaterialsProjectIngestor(BaseIngestor):
@@ -19,8 +21,13 @@ class MaterialsProjectIngestor(BaseIngestor):
 
     NAME = "simulation"
 
-    def __init__(self, out_dir: str = "data/raw", api_key: Optional[str] = None):
-        super().__init__(out_dir)
+    def __init__(
+        self,
+        out_dir: str = "data/raw",
+        api_key: Optional[str] = None,
+        registry: Optional[Registry] = None,
+    ):
+        super().__init__(out_dir=out_dir, registry=registry)
         self.api_key = api_key or settings.MATERIALS_PROJECT_API_KEY
         self.standardize_fn = preprocess_sim
 

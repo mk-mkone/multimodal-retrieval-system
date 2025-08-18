@@ -1,55 +1,88 @@
 import asyncio
 from unittest.mock import AsyncMock
 
+import importlib
+import psycopg
+
 import pytest
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
-from app.api.routes.ingest import router, run_one
+
+@pytest.fixture
+def ingest_module(monkeypatch):
+    class DummyCursor:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def execute(self, *args, **kwargs):
+            return None
+
+    class DummyConn:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def cursor(self):
+            return DummyCursor()
+
+        def commit(self):
+            return None
+
+        def close(self):
+            return None
+
+    monkeypatch.setattr(psycopg, "connect", lambda *a, **k: DummyConn())
+    return importlib.import_module("app.api.routes.ingest")
 
 
-@pytest.fixture(scope="module")
-def test_client():
+@pytest.fixture
+def test_client(ingest_module):
     app = FastAPI()
-    app.include_router(router)
+    app.include_router(ingest_module.router)
     return TestClient(app)
 
 
-def test_run_one_text_ok(mocker):
+def test_run_one_text_ok(mocker, ingest_module):
     mp = mocker.patch("app.api.routes.ingest.EuropePMCIngestor")
     inst = mp.return_value
     inst.run_async = mocker.AsyncMock(return_value=[{"id": 1}, {"id": 2}, {"id": 3}])
 
-    out = asyncio.run(run_one("text"))
+    out = asyncio.run(ingest_module.run_one("text"))
     assert out == {"rows": 3}
     inst.run_async.assert_awaited_once_with(
         query="materials science", page=1, page_size=25
     )
 
 
-def test_run_one_simulation_ok(mocker):
+def test_run_one_simulation_ok(mocker, ingest_module):
     mp = mocker.patch("app.api.routes.ingest.MaterialsProjectIngestor")
     inst = mp.return_value
     inst.run_async = mocker.AsyncMock(return_value=[{"m": "a"}, {"m": "b"}])
 
-    out = asyncio.run(run_one("simulation"))
+    out = asyncio.run(ingest_module.run_one("simulation"))
     assert out == {"rows": 2}
     inst.run_async.assert_awaited_once_with(formula="Si", per_page=10)
 
 
-def test_run_one_experimental_ok(mocker):
+def test_run_one_experimental_ok(mocker, ingest_module):
     ts = mocker.patch("app.api.routes.ingest.TimeSeriesIngestor")
     inst = ts.return_value
     inst.run_async = mocker.AsyncMock(return_value=[{"t": 0}, {"t": 1}])
 
-    out = asyncio.run(run_one("experimental"))
+    out = asyncio.run(ingest_module.run_one("experimental"))
     assert out == {"rows": 2}
     inst.run_async.assert_awaited_once_with(path="data/raw/example_timeseries.csv")
 
 
-def test_run_one_invalid_source_raises():
+def test_run_one_invalid_source_raises(ingest_module):
     with pytest.raises(HTTPException) as exc:
-        asyncio.run(run_one("nope"))
+        asyncio.run(ingest_module.run_one("nope"))
     assert exc.value.status_code == 400
     assert "Invalid source" in exc.value.detail
 

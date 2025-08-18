@@ -9,6 +9,7 @@ import pandas as pd
 import requests
 
 from app.core.logging_factory import LoggerFactory
+from app.core.registry import Registry
 
 
 class BaseIngestor(ABC):
@@ -34,7 +35,9 @@ class BaseIngestor(ABC):
     dump_standardized: bool = True
     standardized_filename: str = "standardized.jsonl"
 
-    def __init__(self, out_dir: str = "data/raw"):
+    def __init__(
+        self, out_dir: str = "data/raw", *, registry: Optional[Registry] = None
+    ):
         """
         Initialize the ingestor with a specified output directory.
 
@@ -44,6 +47,10 @@ class BaseIngestor(ABC):
         self.logger = LoggerFactory.get_logger(f"ingestion.{self.NAME}")
         self.out_dir = Path(out_dir) / self.NAME
         self.out_dir.mkdir(parents=True, exist_ok=True)
+        self.registry: Optional[Registry] = registry
+        self._run_id: Optional[str] = None
+        self._last_raw_path: Optional[Path] = None
+        self._source_id_hint: str = ""
 
     def to_records(self, df: pd.DataFrame) -> List[dict]:
         """Convert parsed DataFrame to list of dict records (override if needed)."""
@@ -77,6 +84,14 @@ class BaseIngestor(ABC):
                     import json as _json
 
                     f.write(_json.dumps(d) + "\n")
+        if self.registry:
+            try:
+                self.registry.record_docs(docs, local_jsonl=str(out))
+            except Exception as e:
+                self.logger.warning(
+                    "registry_record_docs_failed",
+                    extra={"error": str(e), "path": str(out)},
+                )
         self.logger.info("standardized_saved", extra={"path": str(out)})
         return out
 
@@ -135,6 +150,13 @@ class BaseIngestor(ABC):
         self.logger.info(
             "start fetch", extra={"params": {k: str(v) for k, v in kwargs.items()}}
         )
+        self._source_id_hint = str(
+            kwargs.get("source_id")
+            or kwargs.get("query")
+            or kwargs.get("formula")
+            or kwargs.get("path")
+            or ""
+        )
         raw = await self.fetch_async(**kwargs)
         self.logger.info("fetched", extra={"info": self._brief(raw)})
 
@@ -166,6 +188,13 @@ class BaseIngestor(ABC):
         """
         self.logger.info(
             "start fetch", extra={"params": {k: str(v) for k, v in kwargs.items()}}
+        )
+        self._source_id_hint = str(
+            kwargs.get("source_id")
+            or kwargs.get("query")
+            or kwargs.get("formula")
+            or kwargs.get("path")
+            or ""
         )
         raw = self.fetch(**kwargs)
         self.logger.info("fetched", extra={"info": self._brief(raw)})
@@ -270,6 +299,22 @@ class BaseIngestor(ABC):
             path.write_bytes(raw)
         else:
             path.write_text(str(raw), encoding="utf-8")
+
+        self._last_raw_path = path
+
+        if self.registry:
+            try:
+                self.registry.record_raw(
+                    run_id=self._run_id,
+                    source=self.NAME,
+                    source_id=self._source_id_hint or None,
+                    local_path=str(path),
+                )
+            except Exception as e:
+                self.logger.warning(
+                    "registry_record_raw_failed",
+                    extra={"error": str(e), "path": str(path)},
+                )
 
         self.logger.info("raw_saved", extra={"path": str(path)})
         return path

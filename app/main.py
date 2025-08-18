@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from app.api.routes import ingest
 from app.core.config import settings
 from app.core.logging_factory import LoggerFactory
-from app.core.mongo_client import get_client
 from app.core.request_context import RequestLoggingMiddleware
 
 app = FastAPI(title=settings.APP_NAME)
@@ -32,11 +31,3 @@ def health():
         "env": settings.ENV,
         "debug": settings.DEBUG,
     }
-
-
-@app.get("/ping-mongo")
-async def ping_mongo():
-    client = await get_client()
-    db = client.admin
-    res = await db.command("ping")
-    return {"ok": True, "res": res}

@@ -48,7 +48,8 @@ def to_textdoc(row: Dict[str, Any], source: str = "europepmc") -> TextDoc:
 
 def to_simdoc(item: Dict[str, Any], source: str = "materials_project") -> SimulationDoc:
     """Map a raw simulation record (e.g., from Materials Project) into a SimulationDoc, performing
-    canonicalization of chemical formulas and normalizing properties like band gap and density."""
+    canonicalization of chemical formulas and normalizing properties like band gap and density.
+    """
     formula = item.get("formula") or item.get("formula_pretty") or "X"
     canonical, elements = canonicalize_formula(formula)
     mid = item.get("material_id") or canonical

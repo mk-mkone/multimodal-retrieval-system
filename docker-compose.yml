@@ -2,17 +2,6 @@ version: '3.8'
 
 services:
 
-  mongo:
-    image: mongo:6.0
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: materials
-    restart: unless-stopped
-
   api:
     build:
       context: .
@@ -21,9 +10,14 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MONGO_URL=mongodb://mongo:27017
+      - DATABASE_URL_PG=postgresql://appuser:apppassword@postgres:5432/materials_db
+      - S3_ENDPOINT_URL=http://minio:9000
+      - S3_BUCKET=mrs
+      - S3_ACCESS_KEY=minio_user
+      - S3_SECRET_KEY=minio_password
     depends_on:
-      - mongo
+      - postgres
+      - minio
     volumes:
       - .:/app
       - ./logs:/app/logs
@@ -38,5 +32,32 @@ services:
     command: tail -f /dev/null
     restart: unless-stopped
 
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppassword
+      POSTGRES_DB: materials_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio_user
+      MINIO_ROOT_PASSWORD: minio_password
+    volumes:
+      - ./data/minio_data:/data
+
 volumes:
-  mongo_data:
+  postgres_data:
+  minio_data:

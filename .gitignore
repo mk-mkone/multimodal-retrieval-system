@@ -32,3 +32,10 @@ logs/
 *.tar
 *.pid
 docker-compose.override.yml
+
+# MinIO local data
+minio_data/
+local/mrs/
+data/raw/
+data/standardized/
+data/processes/

@@ -5,6 +5,8 @@ import pandas as pd
 from app.core.config import settings
 from app.ingestion.base import BaseIngestor
 from app.preprocessing.pipeline import preprocess_text
+from typing import Optional
+from app.core.registry import Registry
 
 
 class EuropePMCIngestor(BaseIngestor):
@@ -16,8 +18,8 @@ class EuropePMCIngestor(BaseIngestor):
 
     NAME = "text"
 
-    def __init__(self, **kw):
-        super().__init__(**kw)
+    def __init__(self, *, registry: Optional[Registry] = None, **kw):
+        super().__init__(registry=registry, **kw)
         self.standardize_fn = preprocess_text
 
     @staticmethod

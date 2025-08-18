@@ -45,16 +45,38 @@ class Settings(BaseSettings):
         validation_alias="MRS_PORT",
     )
 
-    # --- Mongo ---
-    MONGO_URI: AnyUrl = Field(
-        default="mongodb://mongo:27017",
-        description="MongoDB connection URI.",
-        validation_alias="MRS_MONGO_URI",
+    # --- Postgre ---
+    POSTGRES_URI: AnyUrl = Field(
+        default="postgresql://appuser:apppassword@postgres:5432/materials_db",
+        description="Postgres connection URI.",
+        validation_alias="MRS_POSTGRES_URI",
     )
-    MONGO_DB: str = Field(
-        default="materials_db",
-        description="MongoDB database name.",
-        validation_alias="MRS_MONGO_DB",
+
+    # --- S3 / Minio ---
+    S3_ENDPOINT_URL: str = Field(
+        default="http://minio:9000",
+        description="S3 or Minio endpoint URL.",
+        validation_alias="MRS_S3_ENDPOINT_URL",
+    )
+    S3_BUCKET: str = Field(
+        default="mrs",
+        description="S3 or Minio bucket name.",
+        validation_alias="MRS_S3_BUCKET",
+    )
+    S3_ACCESS_KEY: str = Field(
+        default="minio_user",
+        description="S3 or Minio access key.",
+        validation_alias="MRS_S3_ACCESS_KEY",
+    )
+    S3_SECRET_KEY: str = Field(
+        default="minio_password",
+        description="S3 or Minio secret key.",
+        validation_alias="MRS_S3_SECRET_KEY",
+    )
+    S3_REGION: str = Field(
+        default="eu-west-3",
+        description="S3 or Minio region.",
+        validation_alias="MRS_S3_REGION",
     )
 
     # --- Logging ---

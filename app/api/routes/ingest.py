@@ -6,6 +6,9 @@ from app.core.logging_factory import LoggerFactory
 from app.ingestion.simulation_ingestor import MaterialsProjectIngestor
 from app.ingestion.text_ingestor import EuropePMCIngestor
 from app.ingestion.timeseries_ingestor import TimeSeriesIngestor
+from app.core.db import PostgresClient
+from app.core.s3 import S3Client
+from app.core.registry import Registry
 
 router = APIRouter(prefix="/ingest", tags=["Ingestion"])
 logger = LoggerFactory.get_logger(__name__)
@@ -15,6 +18,11 @@ INGESTORS = {
     "simulation": MaterialsProjectIngestor,
     "experimental": TimeSeriesIngestor,
 }
+
+db = PostgresClient()
+s3 = S3Client()
+registry = Registry(db, s3)
+registry.bootstrap()
 
 
 async def run_one(source: str) -> dict:
@@ -31,15 +39,15 @@ async def run_one(source: str) -> dict:
         HTTPException: If the source is invalid.
     """
     if source == "text":
-        ing = EuropePMCIngestor()
+        ing = EuropePMCIngestor(registry=registry)
         raw = await ing.run_async(query="materials science", page=1, page_size=25)
         return {"rows": len(raw)}
     elif source == "simulation":
-        ing = MaterialsProjectIngestor()
+        ing = MaterialsProjectIngestor(registry=registry)
         raw = await ing.run_async(formula="Si", per_page=10)
         return {"rows": len(raw)}
     elif source == "experimental":
-        ing = TimeSeriesIngestor()
+        ing = TimeSeriesIngestor(registry=registry)
         raw = await ing.run_async(path="data/raw/example_timeseries.csv")
         return {"rows": len(raw)}
     else:
