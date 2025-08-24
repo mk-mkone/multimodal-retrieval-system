@@ -52,8 +52,6 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
-        print(
-            "Usage: python -m app.embedding.build_ts <standardized_ts.jsonl>"
-        )
+        print("Usage: python -m app.embedding.build_ts <standardized_ts.jsonl>")
         raise SystemExit(2)
     run(sys.argv[1:])
