@@ -46,8 +46,6 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
-        print(
-            "Usage: python -m app.embedding.build_text <standardized.jsonl>"
-        )
+        print("Usage: python -m app.embedding.build_text <standardized.jsonl>")
         raise SystemExit(2)
     run(sys.argv[1:])
