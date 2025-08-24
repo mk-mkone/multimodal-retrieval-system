@@ -35,7 +35,7 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -r {} +
 	rm -rf .mypy_cache .pytest_cache .venv .coverage
 
-restart: down up
+restart: down build up
 reset: clean down build up
 
 .PHONY: up down restart logs ps build test test-cov lint
